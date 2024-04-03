@@ -1939,12 +1939,24 @@ inline unsigned int GetPosition(unsigned char*& qbuf, int offset) {
 	unsigned int info = *(unsigned int*)(qbuf + offset);
 	return info >> 24;
 }
-void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
+#ifdef YGOPRO_SERVER_MODE
+void SingleDuel::RefreshMzone(int player, int flag, int use_cache, DuelPlayer* dp)
+#else
+void SingleDuel::RefreshMzone(int player, int flag, int use_cache)
+#endif //YGOPRO_SERVER_MODE
+{
 	std::vector<unsigned char> query_buffer;
 	query_buffer.resize(SIZE_QUERY_BUFFER);
 	auto qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_MZONE, flag, qbuf, use_cache);
+#ifdef YGOPRO_SERVER_MODE
+if(!dp || dp == players[player])
+#endif
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer.data(), len + 4);
+#ifdef YGOPRO_SERVER_MODE
+	if(!dp)
+		NetServer::ReSendToPlayer(replay_recorder);
+#endif
 	int qlen = 0;
 	while(qlen < len) {
 		const int clen = BufferIO::ReadInt32(qbuf);
@@ -1956,7 +1968,13 @@ void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 			memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
+#ifdef YGOPRO_SERVER_MODE
+if(!dp || dp == players[1 - player])
+#endif
 	NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer.data(), len + 4);
+#ifdef YGOPRO_SERVER_MODE
+if(!dp)
+#endif
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 #ifdef YGOPRO_SERVER_MODE
@@ -1974,7 +1992,14 @@ void SingleDuel::RefreshSzone(int player, int flag, int use_cache)
 	query_buffer.resize(SIZE_QUERY_BUFFER);
 	auto qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_SZONE, flag, qbuf, use_cache);
+#ifdef YGOPRO_SERVER_MODE
+if(!dp || dp == players[player])
+#endif
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer.data(), len + 4);
+#ifdef YGOPRO_SERVER_MODE
+	if(!dp)
+		NetServer::ReSendToPlayer(replay_recorder);
+#endif
 	int qlen = 0;
 	while(qlen < len) {
 		const int clen = BufferIO::ReadInt32(qbuf);
@@ -1986,7 +2011,14 @@ void SingleDuel::RefreshSzone(int player, int flag, int use_cache)
 			memset(qbuf, 0, clen - 4);
 		qbuf += clen - 4;
 	}
-	NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer.data(), len + 4);
+#ifdef YGOPRO_SERVER_MODE
+if(!dp || dp == players[player])
+#endif
+	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer.data(), len + 4);
+#ifdef YGOPRO_SERVER_MODE
+	if(!dp)
+		NetServer::ReSendToPlayer(replay_recorder);
+#endif
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 #ifdef YGOPRO_SERVER_MODE
@@ -2004,7 +2036,13 @@ void SingleDuel::RefreshHand(int player, int flag, int use_cache)
 	query_buffer.resize(SIZE_QUERY_BUFFER);
 	auto qbuf = query_buffer.data();
 	auto len = WriteUpdateData(player, LOCATION_HAND, flag, qbuf, use_cache);
-	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer.data(), len + 4);
+#ifdef YGOPRO_SERVER_MODE
+if(!dp || dp == players[1 - player])
+#endif
+	NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer.data(), len + 4);
+#ifdef YGOPRO_SERVER_MODE
+if(!dp)
+#endif
 	int qlen = 0;
 	while(qlen < len) {
 		const int slen = BufferIO::ReadInt32(qbuf);
@@ -2016,7 +2054,13 @@ void SingleDuel::RefreshHand(int player, int flag, int use_cache)
 			memset(qbuf, 0, slen - 4);
 		qbuf += slen - 4;
 	}
+#ifdef YGOPRO_SERVER_MODE
+if(!dp || dp == players[1 - player])
+#endif
 	NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer.data(), len + 4);
+#ifdef YGOPRO_SERVER_MODE
+if(!dp)
+#endif
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 #ifdef YGOPRO_SERVER_MODE

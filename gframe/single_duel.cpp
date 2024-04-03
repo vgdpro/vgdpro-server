@@ -2041,7 +2041,8 @@ if(!dp || dp == players[1 - player])
 #endif
 	NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer.data(), len + 4);
 #ifdef YGOPRO_SERVER_MODE
-if(!dp)
+	if(!dp)
+		NetServer::ReSendToPlayer(replay_recorder);
 #endif
 	int qlen = 0;
 	while(qlen < len) {

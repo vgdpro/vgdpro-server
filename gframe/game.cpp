@@ -216,7 +216,7 @@ bool Game::Initialize() {
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48);
 	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	smgr = device->getSceneManager();
-	device->setWindowCaption(L"YGOPro");
+	device->setWindowCaption(L"VGDPro");
 	device->setResizable(true);
 	if(gameConf.window_maximized)
 		device->maximizeWindow();
@@ -230,7 +230,7 @@ bool Game::Initialize() {
 	SetWindowsIcon();
 	//main menu
 	wchar_t strbuf[256];
-	myswprintf(strbuf, L"YGOPro Version:%X.0%X.%X", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
+	myswprintf(strbuf, L"VGDPro Version:%X.0%X.%X", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
 	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 415), false, strbuf);
 	wMainMenu->getCloseButton()->setVisible(false);
 	btnLanMode = env->addButton(rect<s32>(10, 30, 270, 60), wMainMenu, BUTTON_LAN_MODE, dataManager.GetSysString(1200));
@@ -382,15 +382,15 @@ bool Game::Initialize() {
 	btnPhaseStatus->setIsPushButton(true);
 	btnPhaseStatus->setPressed(true);
 	btnPhaseStatus->setVisible(false);
-	btnBP = env->addButton(rect<s32>(160, 0, 210, 20), wPhase, BUTTON_BP, L"\xff22\xff30");
-	btnBP->setVisible(false);
 	btnM2 = env->addButton(rect<s32>(160, 0, 210, 20), wPhase, BUTTON_M2, L"\xff2d\xff12");
 	btnM2->setVisible(false);
 	btnEP = env->addButton(rect<s32>(320, 0, 370, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
 	btnEP->setVisible(false);
+	btnBP = env->addButton(rect<s32>(160, 0, 210, 20), wPhase, BUTTON_BP, L"\xff22\xff30");
+	btnBP->setVisible(false);
 	//tab
 	wInfos = env->addTabControl(rect<s32>(1, 275, 301, 639), 0, true);
-	wInfos->setTabExtraWidth(16);
+	wInfos->setTabExtraWidth(21);
 	wInfos->setVisible(false);
 	//info
 	irr::gui::IGUITab* tabInfo = wInfos->addTab(dataManager.GetSysString(1270));
@@ -813,7 +813,7 @@ bool Game::Initialize() {
 	stSearch = env->addStaticText(dataManager.GetSysString(1325), rect<s32>(205, 62 + 100 / 6, 280, 82 + 100 / 6), false, false, wFilter);
 	ebCardName = env->addEditBox(L"", rect<s32>(260, 60 + 100 / 6, 390, 80 + 100 / 6), true, wFilter, EDITBOX_KEYWORD);
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnEffectFilter = env->addButton(rect<s32>(345, 20 + 50 / 6, 390, 60 + 75 / 6), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
+	//btnEffectFilter = env->addButton(rect<s32>(345, 20 + 50 / 6, 390, 60 + 75 / 6), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
 	btnStartFilter = env->addButton(rect<s32>(205, 80 + 125 / 6, 390, 100 + 125 / 6), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
 	if(gameConf.separate_clear_button) {
 		btnStartFilter->setRelativePosition(rect<s32>(260, 80 + 125 / 6, 390, 100 + 125 / 6));
@@ -836,23 +836,23 @@ bool Game::Initialize() {
 	int wcatewidth = catewidth * 4 + 16;
 	wCategories->setRelativePosition(rect<s32>(1000 - wcatewidth, 60, 1000, 305));
 	btnCategoryOK->setRelativePosition(recti(wcatewidth / 2 - 50, 210, wcatewidth / 2 + 50, 235));
-	btnMarksFilter = env->addButton(rect<s32>(60, 80 + 125 / 6, 190, 100 + 125 / 6), wFilter, BUTTON_MARKS_FILTER, dataManager.GetSysString(1374));
-	wLinkMarks = env->addWindow(rect<s32>(700, 30, 820, 150), false, L"");
-	wLinkMarks->getCloseButton()->setVisible(false);
-	wLinkMarks->setDrawTitlebar(false);
-	wLinkMarks->setDraggable(false);
-	wLinkMarks->setVisible(false);
-	btnMarksOK = env->addButton(recti(45, 45, 75, 75), wLinkMarks, BUTTON_MARKERS_OK, dataManager.GetSysString(1211));
-	btnMark[0] = env->addButton(recti(10, 10, 40, 40), wLinkMarks, -1, L"\u2196");
-	btnMark[1] = env->addButton(recti(45, 10, 75, 40), wLinkMarks, -1, L"\u2191");
-	btnMark[2] = env->addButton(recti(80, 10, 110, 40), wLinkMarks, -1, L"\u2197");
-	btnMark[3] = env->addButton(recti(10, 45, 40, 75), wLinkMarks, -1, L"\u2190");
-	btnMark[4] = env->addButton(recti(80, 45, 110, 75), wLinkMarks, -1, L"\u2192");
-	btnMark[5] = env->addButton(recti(10, 80, 40, 110), wLinkMarks, -1, L"\u2199");
-	btnMark[6] = env->addButton(recti(45, 80, 75, 110), wLinkMarks, -1, L"\u2193");
-	btnMark[7] = env->addButton(recti(80, 80, 110, 110), wLinkMarks, -1, L"\u2198");
-	for(int i=0;i<8;i++)
-		btnMark[i]->setIsPushButton(true);
+	//btnMarksFilter = env->addButton(rect<s32>(60, 80 + 125 / 6, 190, 100 + 125 / 6), wFilter, BUTTON_MARKS_FILTER, dataManager.GetSysString(1374));
+	//wLinkMarks = env->addWindow(rect<s32>(700, 30, 820, 150), false, L"");
+	//wLinkMarks->getCloseButton()->setVisible(false);
+	//wLinkMarks->setDrawTitlebar(false);
+	// wLinkMarks->setDraggable(false);
+	// wLinkMarks->setVisible(false);
+	// btnMarksOK = env->addButton(recti(45, 45, 75, 75), wLinkMarks, BUTTON_MARKERS_OK, dataManager.GetSysString(1211));
+	// btnMark[0] = env->addButton(recti(10, 10, 40, 40), wLinkMarks, -1, L"\u2196");
+	// btnMark[1] = env->addButton(recti(45, 10, 75, 40), wLinkMarks, -1, L"\u2191");
+	// btnMark[2] = env->addButton(recti(80, 10, 110, 40), wLinkMarks, -1, L"\u2197");
+	// btnMark[3] = env->addButton(recti(10, 45, 40, 75), wLinkMarks, -1, L"\u2190");
+	// btnMark[4] = env->addButton(recti(80, 45, 110, 75), wLinkMarks, -1, L"\u2192");
+	// btnMark[5] = env->addButton(recti(10, 80, 40, 110), wLinkMarks, -1, L"\u2199");
+	// btnMark[6] = env->addButton(recti(45, 80, 75, 110), wLinkMarks, -1, L"\u2193");
+	// btnMark[7] = env->addButton(recti(80, 80, 110, 110), wLinkMarks, -1, L"\u2198");
+	// for(int i=0;i<8;i++)
+	// 	btnMark[i]->setIsPushButton(true);
 	//replay window
 	wReplay = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1202));
 	wReplay->getCloseButton()->setVisible(false);
@@ -1096,7 +1096,7 @@ void Game::MainLoop() {
 		if(cur_time < fps * 17 - 20)
 			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		if(cur_time >= 1000) {
-			myswprintf(cap, L"YGOPro FPS: %d", fps);
+			myswprintf(cap, L"VGDPro FPS: %d", fps);
 			device->setWindowCaption(cap);
 			fps = 0;
 			cur_time -= 1000;
@@ -1623,9 +1623,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		if(dtxt.Width > (300 * xScale - 13) - 15)
 			offset_info = 15;
 		if(!(cd.type & TYPE_LINK)) {
-			const wchar_t* form = L"\u2605";
-			if(cd.type & TYPE_XYZ) form = L"\u2606";
-			myswprintf(formatBuffer, L"[%ls%d] ", form, cd.level);
+			myswprintf(formatBuffer, L"[%ls%d] ", dataManager.GetSysString(1492), cd.level-1);
 			wchar_t adBuffer[16];
 			if(cd.attack < 0 && cd.defense < 0)
 				myswprintf(adBuffer, L"?/?");
@@ -1646,21 +1644,24 @@ void Game::ShowCardInfo(int code, bool resize) {
 			wcscat(formatBuffer, adBuffer);
 			wcscat(formatBuffer, dataManager.FormatLinkMarker(cd.link_marker));
 		}
-		if(cd.type & TYPE_PENDULUM) {
-			wchar_t scaleBuffer[16];
-			myswprintf(scaleBuffer, L"   %d/%d", cd.lscale, cd.rscale);
-			wcscat(formatBuffer, scaleBuffer);
-		}
+		wchar_t scaleBuffer[16];
+		myswprintf(scaleBuffer, L" [%ls%d]", dataManager.GetSysString(1493), cd.lscale);
+		wcscat(formatBuffer, scaleBuffer);
+		// if(cd.type & TYPE_PENDULUM) {
+		// 	wchar_t scaleBuffer[16];
+		// 	myswprintf(scaleBuffer, L"   %d/%d", cd.lscale, cd.rscale);
+		// 	wcscat(formatBuffer, scaleBuffer);
+		// }
 		stDataInfo->setText(formatBuffer);
 		int offset_arrows = offset_info;
 		dtxt = guiFont->getDimension(formatBuffer);
 		if(dtxt.Width > (300 * xScale - 13) - 15)
 			offset_arrows += 15;
-		stInfo->setRelativePosition(rect<s32>(15, 37, 300 * xScale - 13, (60 + offset_info)));
-		stDataInfo->setRelativePosition(rect<s32>(15, (60 + offset_info), 300 * xScale - 13, (83 + offset_arrows)));
-		stSetName->setRelativePosition(rect<s32>(15, (83 + offset_arrows), 296 * xScale, (83 + offset_arrows) + offset));
-		stText->setRelativePosition(rect<s32>(15, (83 + offset_arrows) + offset, 287 * xScale, 324 * yScale));
-		scrCardText->setRelativePosition(rect<s32>(287 * xScale - 20, (83 + offset_arrows) + offset, 287 * xScale, 324 * yScale));
+		stInfo->setRelativePosition(rect<s32>(15, 37, 250 * xScale - 13, (60 + offset_info)));
+		stDataInfo->setRelativePosition(rect<s32>(15, (60 + offset_info), 250 * xScale - 13, (83 + offset_arrows)));
+		stSetName->setRelativePosition(rect<s32>(15, (83 + offset_arrows), 246 * xScale, (83 + offset_arrows) + offset));
+		stText->setRelativePosition(rect<s32>(15, (83 + offset_arrows) + offset, 237 * xScale, 324 * yScale));
+		scrCardText->setRelativePosition(rect<s32>(287 * xScale - 20, (83 + offset_arrows) + offset, 237 * xScale, 324 * yScale));
 	}
 	else {
 		if (is_valid)
@@ -1669,9 +1670,9 @@ void Game::ShowCardInfo(int code, bool resize) {
 			myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(0));
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
-		stSetName->setRelativePosition(rect<s32>(15, 60, 296 * xScale, 60 + offset));
-		stText->setRelativePosition(rect<s32>(15, 60 + offset, 287 * xScale, 324 * yScale));
-		scrCardText->setRelativePosition(rect<s32>(287 * xScale - 20, 60 + offset, 287 * xScale, 324 * yScale));
+		stSetName->setRelativePosition(rect<s32>(15, 60, 246 * xScale, 60 + offset));
+		stText->setRelativePosition(rect<s32>(15, 60 + offset, 237 * xScale, 324 * yScale));
+		scrCardText->setRelativePosition(rect<s32>(287 * xScale - 20, 60 + offset, 237 * xScale, 324 * yScale));
 	}
 	showingcode = code;
 	showingtext = dataManager.GetText(code);
@@ -1696,7 +1697,7 @@ void Game::AddLog(const wchar_t* msg, int param) {
 	}
 }
 void Game::AddChatMsg(const wchar_t* msg, int player) {
-	for(int i = 7; i > 0; --i) {
+	for (int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
 		chatTiming[i] = chatTiming[i - 1];
 		chatType[i] = chatType[i - 1];
@@ -1704,9 +1705,9 @@ void Game::AddChatMsg(const wchar_t* msg, int player) {
 	chatMsg[0].clear();
 	chatTiming[0] = 1200;
 	chatType[0] = player;
-	if(gameConf.hide_player_name && player < 4)
+	if (gameConf.hide_player_name && player < 4)
 		player = 10;
-	switch(player) {
+	switch (player) {
 	case 0: //from host
 		chatMsg[0].append(dInfo.hostname);
 		chatMsg[0].append(L": ");
@@ -1741,10 +1742,13 @@ void Game::AddChatMsg(const wchar_t* msg, int player) {
 		chatMsg[0].append(L"[********]: ");
 		break;
 	default: //from watcher or unknown
-		if(player < 11 || player > 19)
+		if (player < 11 || player > 19)
 			chatMsg[0].append(L"[---]: ");
 	}
 	chatMsg[0].append(msg);
+	wchar_t msg_front[256];
+	myswprintf(msg_front, L"[Chat]%ls", chatMsg[0].c_str());
+	AddLog(msg_front);
 }
 void Game::ClearChatMsg() {
 	for(int i = 7; i >= 0; --i) {
@@ -1903,23 +1907,23 @@ void Game::OnResize() {
 	cbLimit->setRelativePosition(Resize(260, 25 / 6, 390, 20 + 25 / 6));
 	ebStar->setRelativePosition(Resize(60, 60 + 100 / 6, 95, 80 + 100 / 6));
 	ebScale->setRelativePosition(Resize(155, 60 + 100 / 6, 190, 80 + 100 / 6));
-	ebAttack->setRelativePosition(Resize(260, 20 + 50 / 6, 340, 40 + 50 / 6));
-	ebDefense->setRelativePosition(Resize(260, 40 + 75 / 6, 340, 60 + 75 / 6));
+	ebAttack->setRelativePosition(Resize(260, 20 + 50 / 6, 390, 40 + 50 / 6));
+	ebDefense->setRelativePosition(Resize(260, 40 + 75 / 6, 390, 60 + 75 / 6));
 	ebCardName->setRelativePosition(Resize(260, 60 + 100 / 6, 390, 80 + 100 / 6));
-	btnEffectFilter->setRelativePosition(Resize(345, 20 + 50 / 6, 390, 60 + 75 / 6));
+	//btnEffectFilter->setRelativePosition(Resize(345, 20 + 50 / 6, 390, 60 + 75 / 6));
 	btnStartFilter->setRelativePosition(Resize(260, 80 + 125 / 6, 390, 100 + 125 / 6));
 	if(btnClearFilter)
 		btnClearFilter->setRelativePosition(Resize(205, 80 + 125 / 6, 255, 100 + 125 / 6));
-	btnMarksFilter->setRelativePosition(Resize(60, 80 + 125 / 6, 190, 100 + 125 / 6));
+	//btnMarksFilter->setRelativePosition(Resize(60, 80 + 125 / 6, 190, 100 + 125 / 6));
 
-	recti btncatepos = btnEffectFilter->getAbsolutePosition();
-	wCategories->setRelativePosition(recti(
-		btncatepos.LowerRightCorner.X - wCategories->getRelativePosition().getWidth(),
-		btncatepos.LowerRightCorner.Y - btncatepos.getHeight() / 2,
-		btncatepos.LowerRightCorner.X,
-		btncatepos.LowerRightCorner.Y - btncatepos.getHeight() / 2 + 245));
+	//recti btncatepos = btnEffectFilter->getAbsolutePosition();
+	// wCategories->setRelativePosition(recti(
+	// 	btncatepos.LowerRightCorner.X - wCategories->getRelativePosition().getWidth(),
+	// 	btncatepos.LowerRightCorner.Y - btncatepos.getHeight() / 2,
+	// 	btncatepos.LowerRightCorner.X,
+	// 	btncatepos.LowerRightCorner.Y - btncatepos.getHeight() / 2 + 245));
 
-	wLinkMarks->setRelativePosition(ResizeWin(700, 30, 820, 150));
+	//wLinkMarks->setRelativePosition(ResizeWin(700, 30, 820, 150));
 	stDBCategory->setRelativePosition(Resize(10, 9, 100, 29));
 	stDeck->setRelativePosition(Resize(10, 39, 100, 59));
 	stCategory->setRelativePosition(Resize(10, 2 + 25 / 6, 70, 22 + 25 / 6));
@@ -1962,8 +1966,8 @@ void Game::OnResize() {
 	stHintMsg->setRelativePosition(ResizeWin(660 - 160 * xScale, 60, 660 + 160 * xScale, 90));
 
 	//sound / music volume bar
-	scrSoundVolume->setRelativePosition(recti(scrSoundVolume->getRelativePosition().UpperLeftCorner.X, scrSoundVolume->getRelativePosition().UpperLeftCorner.Y, 20 + (300 * xScale) - 70, scrSoundVolume->getRelativePosition().LowerRightCorner.Y));
-	scrMusicVolume->setRelativePosition(recti(scrMusicVolume->getRelativePosition().UpperLeftCorner.X, scrMusicVolume->getRelativePosition().UpperLeftCorner.Y, 20 + (300 * xScale) - 70, scrMusicVolume->getRelativePosition().LowerRightCorner.Y));
+	scrSoundVolume->setRelativePosition(recti(scrSoundVolume->getRelativePosition().UpperLeftCorner.X, scrSoundVolume->getRelativePosition().UpperLeftCorner.Y, 20 + (250 * xScale) - 70, scrSoundVolume->getRelativePosition().LowerRightCorner.Y));
+	scrMusicVolume->setRelativePosition(recti(scrMusicVolume->getRelativePosition().UpperLeftCorner.X, scrMusicVolume->getRelativePosition().UpperLeftCorner.Y, 20 + (250 * xScale) - 70, scrMusicVolume->getRelativePosition().LowerRightCorner.Y));
 
 	recti tabHelperPos = recti(0, 0, 300 * xScale - 50, 365 * yScale - 65);
 	tabHelper->setRelativePosition(tabHelperPos);
@@ -1977,7 +1981,7 @@ void Game::OnResize() {
 	else
 		scrTabHelper->setVisible(false);
 
-	recti tabSystemPos = recti(0, 0, 300 * xScale - 50, 365 * yScale - 65);
+	recti tabSystemPos = recti(0, 0, 250 * xScale - 50, 365 * yScale - 65);
 	tabSystem->setRelativePosition(tabSystemPos);
 	scrTabSystem->setRelativePosition(recti(tabSystemPos.LowerRightCorner.X + 2, 0, tabSystemPos.LowerRightCorner.X + 22, tabSystemPos.LowerRightCorner.Y));
 	s32 tabSystemLastY = elmTabSystemLast->getRelativePosition().LowerRightCorner.Y;
@@ -1989,8 +1993,8 @@ void Game::OnResize() {
 		scrTabSystem->setVisible(false);
 
 	if(gameConf.resize_popup_menu) {
-		int width = 100 * xScale;
-		int height = (yScale >= 0.666) ? 21 * yScale : 14;
+		int width = 100 * mainGame->xScale;
+		int height = (mainGame->yScale >= 0.666) ? 21 * mainGame->yScale : 14;
 		wCmdMenu->setRelativePosition(recti(1, 1, width + 1, 1));
 		btnActivate->setRelativePosition(recti(1, 1, width, height));
 		btnSummon->setRelativePosition(recti(1, 1, width, height));
@@ -2007,20 +2011,20 @@ void Game::OnResize() {
 
 	wCardImg->setRelativePosition(ResizeCardImgWin(1, 1, 20, 18));
 	imgCard->setRelativePosition(ResizeCardImgWin(10, 9, 0, 0));
-	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
-	stName->setRelativePosition(recti(10, 10, 300 * xScale - 13, 10 + 22));
-	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
+	wInfos->setRelativePosition(Resize(1, 275, 251, 639));
+	stName->setRelativePosition(recti(10, 10, 250 * xScale - 13, 10 + 22));
+	lstLog->setRelativePosition(Resize(10, 10, 240, 290));
 	if(showingcode)
 		ShowCardInfo(showingcode, true);
 	else
 		ClearCardInfo();
-	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));
+	btnClearLog->setRelativePosition(Resize(160, 300, 210, 325));
 
 	wPhase->setRelativePosition(Resize(480, 310, 855, 330));
-	btnPhaseStatus->setRelativePosition(Resize(0, 0, 50, 20));
-	btnBP->setRelativePosition(Resize(160, 0, 210, 20));
-	btnM2->setRelativePosition(Resize(160, 0, 210, 20));
-	btnEP->setRelativePosition(Resize(320, 0, 370, 20));
+	btnPhaseStatus->setRelativePosition(Resize(80, 0, 130, 20));
+	btnBP->setRelativePosition(Resize(240, 0, 290, 20));
+	btnM2->setRelativePosition(Resize(240, 0, 290, 20));
+	btnEP->setRelativePosition(Resize(240, 0, 290, 20));
 
 	wChat->setRelativePosition(recti(wInfos->getRelativePosition().LowerRightCorner.X + 6, window_size.Height - 25, window_size.Width, window_size.Height));
 	ebChatInput->setRelativePosition(recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));

@@ -20,6 +20,7 @@ struct Deck {
 	std::vector<code_pointer> main;
 	std::vector<code_pointer> extra;
 	std::vector<code_pointer> side;
+	uint16 deckcountry = 0;
 	Deck() {}
 	Deck(const Deck& ndeck) {
 		main = ndeck.main;
@@ -47,7 +48,7 @@ public:
 	const wchar_t* GetLFListName(int lfhash);
 	const std::unordered_map<int, int>* GetLFListContent(int lfhash);
 	int CheckDeck(Deck& deck, int lfhash, int rule);
-	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, bool is_packlist = false);
+	int LoadDeck(Deck& deck, int* dbuf, int mainc,int extrac, int sidec, bool is_packlist = false);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 #ifndef YGOPRO_SERVER_MODE
 	void GetCategoryPath(wchar_t* ret, int index, const wchar_t* text);

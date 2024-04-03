@@ -30,6 +30,12 @@ public:
 	std::vector<ClientCard*> mzone[2];
 	std::vector<ClientCard*> szone[2];
 	std::vector<ClientCard*> grave[2];
+	std::vector<ClientCard*> exile[2];
+	std::vector<ClientCard*> order[2];
+	std::vector<ClientCard*> emblem[2];
+	std::vector<ClientCard*> damage[2];
+	std::vector<ClientCard*> spare[2];
+	std::vector<ClientCard*> gzone[2];
 	std::vector<ClientCard*> remove[2];
 	std::vector<ClientCard*> extra[2];
 	std::set<ClientCard*> overlay_cards;
@@ -74,6 +80,12 @@ public:
 	std::vector<int> sort_list;
 	std::map<int, int> player_desc_hints[2];
 	bool grave_act{ false };
+	bool exile_act{ false };
+	bool order_act{ false };
+	bool emblem_act{ false };
+	bool damage_act{ false };
+	bool spare_act{ false };
+	bool gzone_act{ false };	
 	bool remove_act{ false };
 	bool deck_act{ false };
 	bool extra_act{ false };

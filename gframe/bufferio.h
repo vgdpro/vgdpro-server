@@ -12,6 +12,16 @@ public:
 		p += 4;
 		return ret;
 	}
+	inline static uint16_t ReadUInt16(unsigned char*& p) {
+		uint16_t ret = *(uint16_t*)p;
+		p += 2; // 移动2个字节
+		return ret;
+	}
+	inline static uint64_t ReadUInt64(unsigned char*& p) {
+		uint64_t ret = *(uint64_t*)p;
+		p += 8; // 移动2个字节
+		return ret;
+	}
 	inline static short ReadInt16(unsigned char*& p) {
 		short ret = *(short*)p;
 		p += 2;

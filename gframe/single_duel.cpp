@@ -1495,10 +1495,17 @@ int SingleDuel::Analyze(unsigned char* msgbuffer, unsigned int len) {
 			NetServer::ReSendToPlayer(replay_recorder);
 #endif
 			for (int i = 0; i < count; ++i) {
-				if(!(pbufw[3] & 0x0080))
-					BufferIO::WriteInt32(pbufw, 0);
-				else
-					pbufw += 4;
+				BufferIO::WriteInt32(pbufw, 0);
+				FILE *fp = fopen("error.log", "at");
+				// for(int i = 0; i < len; ++i) {
+				// 	fprintf(fp, "%d\n", BufferIO::ReadInt32(deckbuf)); // 将每个字节的十六进制表示写入文件
+				// }
+				fprintf(fp, "%d\n", (int *)mainGame->dInfo.curMsg);
+				fclose(fp);
+				// if(!(pbufw[3] & 0x0080))
+				// 	BufferIO::WriteInt32(pbufw, 0);
+				// else
+				// 	pbufw += 4;
 			}
 			NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, offset, pbuf - offset);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)

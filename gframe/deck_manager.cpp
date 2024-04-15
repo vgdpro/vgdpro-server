@@ -348,6 +348,10 @@ bool DeckManager::CheckCardEx(Deck& deck, CardDataC cd)
 	bool disaster = false;
 
 	for(auto& pcard : deck.extra){
+		//检查rider等级
+		if(pcard->second.level == cd.level){
+			return false;
+		}
 		if(pcard->second.country == 0x200){
 			if (pcard->second.code == 10602015)
 				monster_marble_dragon_chk++;

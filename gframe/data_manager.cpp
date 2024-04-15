@@ -4,7 +4,7 @@
 
 namespace ygo {
 
-const wchar_t* DataManager::unknown_string = L"???";
+const wchar_t* DataManager::unknown_string = L"";//????
 byte DataManager::scriptBuffer[0x20000];
 #if !defined(YGOPRO_SERVER_MODE) || defined(SERVER_ZIP_SUPPORT)
 IFileSystem* DataManager::FileSystem;
@@ -103,18 +103,34 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 			cd.race = sqlite3_column_int(pStmt, 8);
 			cd.attribute = sqlite3_column_int(pStmt, 9);
 			cd.category = sqlite3_column_int(pStmt, 10);
+			cd.country = sqlite3_column_int(pStmt, 11);
 			_datas[cd.code] = cd;
 #ifndef YGOPRO_SERVER_MODE
-			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
+			if(const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.name = strBuffer;
+				// std::string directory_path = "script";
+				// std::string file_name = "c"+std::to_string(cd.code)+".lua";
+
+				// // 拼接文件路径
+				// std::string file_path = directory_path + "/" + file_name;
+
+				// FILE *fp = fopen(file_path.c_str(), "at");
+				// // for(int i = 0; i < len; ++i) {
+				// // 	fprintf(fp, "%d\n", BufferIO::ReadInt32(deckbuf)); // 将每个字节的十六进制表示写入文件
+				// // }
+				// fprintf(fp, "local cm,m,o=GetID()\n");
+				// fprintf(fp, "function cm.initial_effect(c)\n");
+				// fprintf(fp, "	vgf.VgCard(c)\n");
+				// fprintf(fp, "end\n");
+				// fclose(fp);
 			}
-			if(const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
+			if(const char* text = (const char*)sqlite3_column_text(pStmt, 14)) {
 				BufferIO::DecodeUTF8(text, strBuffer);
 				cs.text = strBuffer;
 			}
 			for(int i = 0; i < 16; ++i) {
-				if(const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
+				if(const char* text = (const char*)sqlite3_column_text(pStmt, i + 15)) {
 					BufferIO::DecodeUTF8(text, strBuffer);
 					cs.desc[i] = strBuffer;
 				}
@@ -229,6 +245,31 @@ bool DataManager::GetData(unsigned int code, CardData* pData) {
 		pData->lscale = data.lscale;
 		pData->rscale = data.rscale;
 		pData->link_marker = data.link_marker;
+		pData->country = data.country;
+	}
+	return true;
+}
+bool DataManager::GetData(unsigned int code, CardDataC* pData) {
+	code_pointer cdit = _datas.find(code);
+	if(cdit == _datas.end())
+		return false;
+	auto& data = cdit->second;
+	if (pData) {
+		pData->code = data.code;
+		pData->alias = data.alias;
+		memcpy(pData->setcode, data.setcode, SIZE_SETCODE);
+		pData->type = data.type;
+		pData->level = data.level;
+		pData->attribute = data.attribute;
+		pData->race = data.race;
+		pData->attack = data.attack;
+		pData->defense = data.defense;
+		pData->lscale = data.lscale;
+		pData->rscale = data.rscale;
+		pData->link_marker = data.link_marker;
+		pData->country = data.country;
+		pData->category = data.category;
+		pData->ot = data.ot;
 	}
 	return true;
 }
@@ -265,14 +306,14 @@ const wchar_t* DataManager::GetText(int code) {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetDesc(unsigned int strCode) {
-	if(strCode < 10000u)
+	if (strCode < 10000u)
 		return GetSysString(strCode);
 	unsigned int code = (strCode >> 4) & 0x0fffffff;
 	unsigned int offset = strCode & 0xf;
 	auto csit = _strings.find(code);
-	if(csit == _strings.end())
+	if (csit == _strings.end())
 		return unknown_string;
-	if(!csit->second.desc[offset].empty())
+	if (!csit->second.desc[offset].empty())
 		return csit->second.desc[offset].c_str();
 	return unknown_string;
 }
@@ -342,7 +383,7 @@ const wchar_t* DataManager::FormatAttribute(int attribute) {
 	wchar_t* p = attBuffer;
 	unsigned filter = 1;
 	int i = 1010;
-	for(; filter != 0x80; filter <<= 1, ++i) {
+	for(; filter != 0x40; filter <<= 1, ++i) {
 		if(attribute & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';

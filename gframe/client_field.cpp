@@ -1063,7 +1063,7 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	t->Y = 0;
 	t->Z = 0;
 	int rule = (mainGame->dInfo.duel_rule >= 4) ? 1 : 0;
-	switch((location & 0x7f)) {
+	switch((location & 0xff7f)) {
 	case LOCATION_DECK: {
 		t->X = (matManager.vFieldDeck[controler][0].Pos.X + matManager.vFieldDeck[controler][1].Pos.X) / 2;
 		t->Y = (matManager.vFieldDeck[controler][0].Pos.Y + matManager.vFieldDeck[controler][2].Pos.Y) / 2;
@@ -1191,7 +1191,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		int count = hand[controler].size();
 		if (controler == 0) {
 			if (count <= 6)
-				t->X = (5.5f - 0.8f * count) / 2 + 1.55f + sequence * 0.8f;
+				t->X = (5.5f - 0.8f * count) / 2 + 1.75f + sequence * 0.8f;
 			else
 				t->X = 1.9f + sequence * 4.0f / (count - 1);
 			if (pcard->is_hovered) {
@@ -1212,7 +1212,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			}
 		} else {
 			if (count <= 6)
-				t->X = 6.25f - (5.5f - 0.8f * count) / 2 - sequence * 0.8f;
+				t->X = 6.15f - (5.5f - 0.8f * count) / 2 - sequence * 0.8f;
 			else
 				t->X = 5.9f - sequence * 4.0f / (count - 1);
 			if (pcard->is_hovered) {
@@ -1326,13 +1326,33 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		t->Y = (matManager.vFieldOrder[controler][rule][0].Pos.Y + matManager.vFieldOrder[controler][rule][2].Pos.Y) / 2;
 		t->Z = 0.01f + 0.01f * sequence;
 		if (controler == 0) {
-			r->X = 0.0f;
-			r->Y = 0.0f;
-			r->Z = 0.0f;
+			if (pcard->position & POS_DEFENSE) {
+				r->X = 0.0f;
+				r->Z = -3.1415926f / 2.0f;
+				if (pcard->position & POS_FACEDOWN)
+					r->Y = 3.1415926f + 0.001f;
+				else r->Y = 0.0f;
+			} else {
+				r->X = 0.0f;
+				r->Z = 0.0f;
+				if (pcard->position & POS_FACEDOWN)
+					r->Y = 3.1415926f;
+				else r->Y = 0.0f;
+			}
 		} else {
-			r->X = 0.0f;
-			r->Y = 0.0f;
-			r->Z = 3.1415926f;
+			if (pcard->position & POS_DEFENSE) {
+				r->X = 0.0f;
+				r->Z = 3.1415926f / 2.0f;
+				if (pcard->position & POS_FACEDOWN)
+					r->Y = 3.1415926f + 0.001f;
+				else r->Y = 0.0f;
+			} else {
+				r->X = 0.0f;
+				r->Z = 3.1415926f;
+				if (pcard->position & POS_FACEDOWN)
+					r->Y = 3.1415926f;
+				else r->Y = 0.0f;
+			}
 		}
 		break;
 	}
@@ -1341,40 +1361,67 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		t->Y = (matManager.vFieldEmblem[controler][rule][0].Pos.Y + matManager.vFieldEmblem[controler][rule][2].Pos.Y) / 2;
 		t->Z = 0.01f + 0.01f * sequence;
 		if (controler == 0) {
-			r->X = 0.0f;
-			r->Y = 0.0f;
-			r->Z = 0.0f;
-		}
-		else {
-			r->X = 0.0f;
-			r->Y = 0.0f;
-			r->Z = 3.1415926f;
+			if (pcard->position & POS_DEFENSE) {
+				r->X = 0.0f;
+				r->Z = -3.1415926f / 2.0f;
+				if (pcard->position & POS_FACEDOWN)
+					r->Y = 3.1415926f + 0.001f;
+				else r->Y = 0.0f;
+			} else {
+				r->X = 0.0f;
+				r->Z = 0.0f;
+				if (pcard->position & POS_FACEDOWN)
+					r->Y = 3.1415926f;
+				else r->Y = 0.0f;
+			}
+		} else {
+			if (pcard->position & POS_DEFENSE) {
+				r->X = 0.0f;
+				r->Z = 3.1415926f / 2.0f;
+				if (pcard->position & POS_FACEDOWN)
+					r->Y = 3.1415926f + 0.001f;
+				else r->Y = 0.0f;
+			} else {
+				r->X = 0.0f;
+				r->Z = 3.1415926f;
+				if (pcard->position & POS_FACEDOWN)
+					r->Y = 3.1415926f;
+				else r->Y = 0.0f;
+			}
 		}
 		break;
 	}
 	case LOCATION_DAMAGE: {
-		t->X = (matManager.vFieldDamage[controler][rule][0].Pos.X + matManager.vFieldDamage[controler][rule][1].Pos.X) / 2;
+		t->X = controler == 0?matManager.vFieldDamage[controler][rule][0].Pos.X +0.38+ 0.18f * sequence : matManager.vFieldDamage[controler][rule][0].Pos.X - 0.38 - 0.18f * sequence;
 		t->Y = (matManager.vFieldDamage[controler][rule][0].Pos.Y + matManager.vFieldDamage[controler][rule][2].Pos.Y) / 2;
-		t->Z = 0.01f + 0.01f * sequence;
+		t->Z = 0.001f + 0.001f * sequence;
 		if (controler == 0) {
-			if(pcard->position & POS_FACEUP) {
+			if (pcard->position & POS_DEFENSE) {
 				r->X = 0.0f;
-				r->Y = 0.0f;
-				r->Z = 0.0f;
+				r->Z = -3.1415926f / 2.0f;
+				if (pcard->position & POS_FACEDOWN)
+					r->Y = 3.1415926f + 0.001f;
+				else r->Y = 0.0f;
 			} else {
 				r->X = 0.0f;
-				r->Y = 3.1415926f;
 				r->Z = 0.0f;
+				if (pcard->position & POS_FACEDOWN)
+					r->Y = 3.1415926f;
+				else r->Y = 0.0f;
 			}
 		} else {
-			if(pcard->position & POS_FACEUP) {
+			if (pcard->position & POS_DEFENSE) {
 				r->X = 0.0f;
-				r->Y = 0.0f;
-				r->Z = 3.1415926f;
+				r->Z = 3.1415926f / 2.0f;
+				if (pcard->position & POS_FACEDOWN)
+					r->Y = 3.1415926f + 0.001f;
+				else r->Y = 0.0f;
 			} else {
 				r->X = 0.0f;
-				r->Y = 3.1415926f;
 				r->Z = 3.1415926f;
+				if (pcard->position & POS_FACEDOWN)
+					r->Y = 3.1415926f;
+				else r->Y = 0.0f;
 			}
 		}
 		break;

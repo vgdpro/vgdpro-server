@@ -92,12 +92,8 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 	if(!list)
 		return 0;
 	int dc = 0;
-	if(deck.main.size() < 40 || deck.main.size() > 60)
+	if(deck.main.size() != 50)
 		return (DECKERROR_MAINCOUNT << 28) + deck.main.size();
-	if(deck.extra.size() > 15)
-		return (DECKERROR_EXTRACOUNT << 28) + deck.extra.size();
-	if(deck.side.size() > 15)
-		return (DECKERROR_SIDECOUNT << 28) + deck.side.size();
 	const int rule_map[6] = { AVAIL_OCG, AVAIL_TCG, AVAIL_SC, AVAIL_CUSTOM, AVAIL_OCGTCG, 0 };
 	int avail = rule_map[rule];
 	for(size_t i = 0; i < deck.main.size(); ++i) {
@@ -130,33 +126,27 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, int rule) {
 		if(it != list->end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) + cit->first;
 	}
-	for(size_t i = 0; i < deck.side.size(); ++i) {
-		code_pointer cit = deck.side[i];
-		int gameruleDeckError = checkAvail(cit->second.ot, avail);
-		if(gameruleDeckError)
-			return (gameruleDeckError << 28) + cit->first;
-		int code = cit->second.alias ? cit->second.alias : cit->first;
-		ccount[code]++;
-		dc = ccount[code];
-		if(dc > 4)
-			return (DECKERROR_CARDCOUNT << 28) + cit->first;
-		auto it = list->find(code);
-		if(it != list->end() && dc > it->second)
-			return (DECKERROR_LFLIST << 28) + cit->first;
-	}
+	// for(size_t i = 0; i < deck.side.size(); ++i) {
+	// 	code_pointer cit = deck.side[i];
+	// 	int gameruleDeckError = checkAvail(cit->second.ot, avail);
+	// 	if(gameruleDeckError)
+	// 		return (gameruleDeckError << 28) + cit->first;
+	// 	int code = cit->second.alias ? cit->second.alias : cit->first;
+	// 	ccount[code]++;
+	// 	dc = ccount[code];
+	// 	if(dc > 4)
+	// 		return (DECKERROR_CARDCOUNT << 28) + cit->first;
+	// 	auto it = list->find(code);
+	// 	if(it != list->end() && dc > it->second)
+	// 		return (DECKERROR_LFLIST << 28) + cit->first;
+	// }
 	return 0;
 }
-int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc,int extrac, int sidec, bool is_packlist) {
+int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc,int extrac, int sidec, bool is_packlist, bool forduel) {
 	deck.clear();
 	int code;
 	int errorcode = 0;
-	uint16_t deckcountry = 0;
-	CardData cd;
-	for(int i=0; i<(mainc+extrac);++i){
-		if(deckcountry == 0 && (!(cd.country & 0x1)) && (cd.country != 0 && (cd.country & (cd.country - 1)) == 0)){
-			deckcountry = cd.country;
-		}
-	}
+	CardDataC cd;
 	for(int i = 0; i < mainc; ++i) {
 		code = dbuf[i];
 		if(!dataManager.GetData(code, &cd)) {
@@ -169,14 +159,9 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc,int extrac, int sidec
 			deck.main.push_back(dataManager.GetCodePointer(code));
 			continue;
 		}
-		else if (deckcountry != 0 || cd.country & 0x1)
-		{
-			if(!cd.country&deckcountry){
-				continue;
-			}
-		}
-		else if(deck.main.size() < 50) {
-			deck.main.push_back(dataManager.GetCodePointer(code));
+		else if(deck.main.size() < 51) {
+			if(CheckCard(deck,cd))
+				deck.main.push_back(dataManager.GetCodePointer(code));
 		}
 	}
 	for(int i = 0; i < extrac; ++i) {
@@ -187,29 +172,245 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc,int extrac, int sidec
 		}
 		if(cd.type & TYPE_TOKEN)
 			continue;
-		else if (deckcountry != 0 || cd.country & 0x1)
-		{
-			if (!cd.country & deckcountry)
-			{
-				continue;
-			}
-		}
-		else if(deck.extra.size() < 15){
-			deck.extra.push_back(dataManager.GetCodePointer(code));
+		else if(deck.extra.size() < 30){
+			if(CheckCard(deck,cd))
+				deck.extra.push_back(dataManager.GetCodePointer(code));
 		}
 	}
-	// for(int i = 0; i < sidec; ++i) {
-	// 	code = dbuf[mainc +extrac + i];
-	// 	if(!dataManager.GetData(code, &cd)) {
-	// 		errorcode = code;
-	// 		continue;
-	// 	}
-	// 	if(cd.type & TYPE_TOKEN)
-	// 		continue;
-	// 	if(deck.side.size() < 15)
-	// 		deck.side.push_back(dataManager.GetCodePointer(code));
-	// }
+	if(deck.Gcheck.size() == 4 && forduel){
+		for(int i = 0; i < sidec; ++i) {
+			code = dbuf[mainc +extrac + i];
+			if(!dataManager.GetData(code, &cd)) {
+				errorcode = code;
+				continue;
+			}
+			if(cd.type & TYPE_TOKEN)
+				continue;
+			if(deck.extra.size() < 15)
+				if(CheckCard(deck,cd))
+					deck.extra.push_back(dataManager.GetCodePointer(code));
+		}
+	}
+	else if (!forduel)
+	{
+		for(int i = 0; i < sidec; ++i) {
+			code = dbuf[mainc +extrac + i];
+			if(!dataManager.GetData(code, &cd)) {
+				errorcode = code;
+				continue;
+			}
+			if(cd.type & TYPE_TOKEN)
+				continue;
+			if(deck.side.size() < 15)
+				if(CheckCard(deck,cd))
+					deck.side.push_back(dataManager.GetCodePointer(code));
+		}
+	}
+	
 	return errorcode;
+}
+bool DeckManager::CheckCard(Deck& deck, CardDataC cd)
+{
+	std::vector<code_pointer> deck_all = deck.main;
+	deck_all.insert(deck_all.begin(),deck.extra.begin(),deck.extra.end());
+	deck_all.push_back(dataManager.GetCodePointer(cd.code));
+
+	uint16 deckcountry = 0;
+	int trigger_card = 0;
+	int trigger_heal = 0;
+	int trigger_crit = 0;
+	int trigger_draw = 0;
+	int trigger_front = 0;
+	bool trigger_over = false;
+	bool regalis_piece = false;
+
+	for(auto& pcard : deck_all){
+
+		CardDataC cd = pcard->second;
+
+		int country = cd.country & 0x0FFF;
+		if (deckcountry == 0 && (!(country & 0x1)) && (country != 0 && (country & (country - 1)) == 0))
+		{
+			deckcountry = country;
+		}
+
+		//势力
+		if (deckcountry != 0 || cd.country & 0x1)
+		{
+			if (!(cd.country & deckcountry) && !(cd.country & 0x1))
+			{
+				return false;
+			}
+
+			//g卡组检测
+			if (deckcountry == 0x2 && (cd.code == 10910004 || cd.code == 10910003 || cd.code == 10910002 || cd.code == 10910001))
+			{
+				auto it = std::find(deck.Gcheck.begin(), deck.Gcheck.end(),cd.code);
+					if(it == deck.Gcheck.end())
+						deck.Gcheck.push_back(cd.code);
+			}
+			else if (deckcountry == 0x4 && (cd.code == 10909004 || cd.code == 10909003 || cd.code == 10909002 || cd.code == 10909001))
+			{
+				auto it = std::find(deck.Gcheck.begin(), deck.Gcheck.end(),cd.code);
+					if(it == deck.Gcheck.end())
+						deck.Gcheck.push_back(cd.code);
+			}
+			else if (deckcountry == 0x10 && (cd.code == 10904001 || cd.code == 10904002 || cd.code == 10904003 || cd.code == 10904004))
+			{
+				auto it = std::find(deck.Gcheck.begin(), deck.Gcheck.end(),cd.code);
+					if(it == deck.Gcheck.end())
+						deck.Gcheck.push_back(cd.code);
+			}
+			else if (deckcountry == 0x20 && (cd.code == 10903004 || cd.code == 10903002 || cd.code == 10903003 || cd.code == 10903001))
+			{
+				auto it = std::find(deck.Gcheck.begin(), deck.Gcheck.end(),cd.code);
+					if(it == deck.Gcheck.end())
+						deck.Gcheck.push_back(cd.code);
+			}
+		}
+
+		//触发
+		if (!(cd.race & RACE_WARRIOR))
+		{
+			if (trigger_card >= 16)
+			{
+				return false;
+			}
+			if(cd.race & RACE_SPELLCASTER){
+				if (trigger_crit >= 8)
+				{
+					return false;
+				}
+				else{
+					trigger_crit++;
+					trigger_card++;
+				}
+			}
+			if(cd.race & RACE_FAIRY){
+				if (trigger_draw >= 8)
+				{
+					return false;
+				}
+				else{
+					trigger_draw++;
+					trigger_card++;
+				}
+			}
+			if(cd.race & RACE_FIEND){
+				if (trigger_heal >= 4)
+				{
+					return false;
+				}
+				else{
+					trigger_heal++;
+					trigger_card++;
+				}
+			}	
+			if(cd.race & RACE_ZOMBIE){
+				if (trigger_front >= 8)
+				{
+					return false;
+				}
+				else{
+					trigger_front++;
+					trigger_card++;
+				}
+			}	
+			if(cd.race & RACE_MACHINE){
+				if (trigger_over)
+				{
+					return false;
+				}
+				else{
+					trigger_over = true;
+					trigger_card++;
+				}
+			}			
+		}
+
+		//结晶碎片
+		if (cd.is_setcode(0x204))
+		{
+			if (regalis_piece)
+			{
+				return false;
+			}
+			else
+			{
+				regalis_piece = true;
+			}
+		}
+	}
+
+	return true;
+}
+bool DeckManager::CheckCardEx(Deck& deck, CardDataC cd)
+{
+	if(cd.level>4){
+		return false;
+	}
+	int monster_marble_chk = 0;
+	int monster_marble_dragon_chk = 0;
+	int disaster_chk = 0;
+	
+	bool monster_marble = false;
+	bool monster_marble_dragon = false;
+	bool disaster = false;
+
+	for(auto& pcard : deck.extra){
+		if(pcard->second.country == 0x200){
+			if (pcard->second.code == 10602015)
+				monster_marble_dragon_chk++;
+			monster_marble_chk++;
+		}
+		else if (pcard->second.code == 10409097 || pcard->second.is_setcode(0xc042)){
+			disaster_chk++;
+		}
+	}
+	if (monster_marble_chk != 0){
+		monster_marble = true;
+		monster_marble_chk = 0;
+	}
+	else
+		monster_marble = false;
+
+	if (monster_marble_dragon_chk != 0){
+		monster_marble_dragon = true;
+		monster_marble_dragon_chk = 0;
+	}
+	else
+		monster_marble_dragon = false;
+
+	if (disaster_chk != 0){
+		disaster = true;
+		disaster_chk = 0;
+	}
+	else
+		disaster = false;
+	
+	//龙树
+	if (disaster){
+		if (cd.code == 10409097 || cd.is_setcode(0xc042))
+		{
+			return true;
+		}
+		else if (cd.race & RACE_MACHINE)
+			return true;
+		return false;
+	}
+
+	//怪物弹珠
+	if (monster_marble){
+		if (cd.country == 0x200)
+		{
+			if (cd.code == 10602015 && monster_marble_dragon)
+				return false;
+			return true;
+		}
+		return false;
+	}
+
+	return true;
 }
 bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	std::unordered_map<int, int> pcount;

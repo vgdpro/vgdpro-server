@@ -35,14 +35,14 @@ public:
 	void DuelEndProc();
 	void WaitforResponse(int playerid);
 #ifdef YGOPRO_SERVER_MODE
-	void RefreshMzone(int player, int flag = 0x881fff, int use_cache = 1, DuelPlayer* dp = 0);
+	void RefreshMzone(int player, int flag = 0xA81FFF, int use_cache = 1, DuelPlayer* dp = 0);
 	void RefreshSzone(int player, int flag = 0x681fff, int use_cache = 1, DuelPlayer* dp = 0);
 	void RefreshHand(int player, int flag = 0x681fff, int use_cache = 1, DuelPlayer* dp = 0);
 	void RefreshGrave(int player, int flag = 0x81fff, int use_cache = 1, DuelPlayer* dp = 0);
 	void RefreshExtra(int player, int flag = 0xe81fff, int use_cache = 1, DuelPlayer* dp = 0);
 	void RefreshRemoved(int player, int flag = 0x81fff, int use_cache = 1, DuelPlayer* dp = 0);
 #else
-	void RefreshMzone(int player, int flag = 0x881fff, int use_cache = 1);
+	void RefreshMzone(int player, int flag = 0xA81FFF, int use_cache = 1);
 	void RefreshSzone(int player, int flag = 0x681fff, int use_cache = 1);
 	void RefreshHand(int player, int flag = 0x681fff, int use_cache = 1);
 	void RefreshGrave(int player, int flag = 0x81fff, int use_cache = 1);

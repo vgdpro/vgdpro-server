@@ -85,7 +85,8 @@ public:
 	bool emblem_act{ false };
 	bool damage_act{ false };
 	bool spare_act{ false };
-	bool gzone_act{ false };	
+	bool gzone_act{ false };
+	bool mzone_act{ false };	
 	bool remove_act{ false };
 	bool deck_act{ false };
 	bool extra_act{ false };

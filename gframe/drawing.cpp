@@ -510,6 +510,12 @@ void Game::DrawMisc() {
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
+	if(dField.mzone_act == true){
+		im.setTranslation(vector3df((matManager.vFieldMzone[0][5][0].Pos.X + matManager.vFieldMzone[0][5][1].Pos.X) / 2,
+			(matManager.vFieldMzone[0][5][0].Pos.Y + matManager.vFieldMzone[0][5][2].Pos.Y) / 2, 0.03f));
+		driver->setTransform(irr::video::ETS_WORLD, im);
+		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
+	}
 	if(dField.pzone_act[0]) {
 		int seq = dInfo.duel_rule >= 4 ? 0 : 6;
 		im.setTranslation(vector3df((matManager.vFieldSzone[0][seq][rule][0].Pos.X + matManager.vFieldSzone[0][seq][rule][1].Pos.X) / 2,

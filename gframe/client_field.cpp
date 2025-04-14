@@ -156,6 +156,7 @@ void ClientField::Clear() {
 	damage_act = false;
 	spare_act = false;
 	gzone_act = false;
+	mzone_act = false;
 	emblem_act = false;
 	remove_act = false;
 	extra_act = false;
@@ -566,6 +567,7 @@ void ClientField::ClearCommandFlag() {
 	damage_act = false;
 	spare_act = false;
 	gzone_act = false;
+	mzone_act = false;
 	emblem_act = false;
 	remove_act = false;
 	pzone_act[0] = false;
@@ -604,6 +606,7 @@ void ClientField::ClearChainSelect() {
 	order_act = false;
 	damage_act = false;
 	spare_act = false;
+	mzone_act = false;
 	gzone_act = false;
 	emblem_act = false;
 	remove_act = false;

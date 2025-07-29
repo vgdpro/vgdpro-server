@@ -101,7 +101,7 @@ jobs:
     - name: Download irrlicht
       if: matrix.ygopro2 == true
       run: |
-        git clone --depth=1 https://github.com/mercury233/irrlicht
+        git clone https://github.com/mercury233/irrlicht
         cd irrlicht
         git checkout 8886cee
         cd ..
@@ -109,7 +109,6 @@ jobs:
     - name: Copy premake files
       run: |
         xcopy /E premake\* .
-        xcopy /E resource\* .
 
     - name: Use premake to generate Visual Studio solution
       run: |
@@ -243,7 +242,7 @@ jobs:
     - name: Download irrlicht
       if: matrix.zip-support == true
       run: |
-        git clone --depth=1 https://github.com/mercury233/irrlicht
+        git clone https://github.com/mercury233/irrlicht
         cd irrlicht
         git checkout 8886cee
         cd ..
@@ -251,7 +250,6 @@ jobs:
     - name: Copy premake files
       run: |
         cp -r premake/* .
-        cp -r resource/* .
 
     - name: Use premake to generate make files
       run: |

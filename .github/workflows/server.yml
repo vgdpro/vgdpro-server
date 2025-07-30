@@ -253,8 +253,7 @@ jobs:
 
     - name: Use premake to generate make files
       run: |
-        ./premake5 gmake ${{ matrix.zip-support && '--server-zip-support' || '' }} \
-          ${{ matrix.static-link && '--build-sqlite --build-event' || '' }}
+        ./premake5 gmake
 
     - name: Make
       run: |

@@ -253,7 +253,7 @@ jobs:
 
     - name: Use premake to generate make files
       run: |
-        ./premake5 gmake --lua-deb
+        ./premake5 gmake
 
     - name: Make
       run: |

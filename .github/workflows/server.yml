@@ -136,6 +136,11 @@ jobs:
         git pull origin master
         cd ..
 
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libevent-dev libsqlite3-dev
+
     - name: Download premake
       id: premake
       uses: mercury233/action-cache-download-file@v1.0.0
@@ -147,6 +152,25 @@ jobs:
       run: |
         tar xf ${{ steps.premake.outputs.filepath }}
         chmod +x ./premake5
+
+    - name: Download libevent
+      id: libevent
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
+        filename: libevent.tar.gz
+
+    - name: Extract libevent
+      run: |
+        tar xf ${{ steps.libevent.outputs.filepath }}
+        mv libevent-2.1.12-stable event
+
+    - name: Configure libevent
+      run: |
+        cd event
+        ./configure --disable-openssl --enable-static=yes --enable-shared=no
+        sed -f make-event-config.sed < config.h > ./include/event2/event-config.h
+        cd ..
 
     - name: Download lua
       id: lua
@@ -166,6 +190,17 @@ jobs:
         cd irrlicht
         git checkout 8886cee
         cd ..
+
+    - name: Download sqlite
+      id: sqlite
+      uses: mercury233/action-cache-download-file@v1.0.0
+      with:
+        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
+
+    - name: Extract sqlite
+      run: |
+        7z x ${{ steps.sqlite.outputs.filepath }}
+        mv sqlite-amalgamation-3490100 sqlite3
 
     - name: Copy premake files
       run: |

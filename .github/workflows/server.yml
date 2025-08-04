@@ -170,10 +170,6 @@ jobs:
         git checkout master
         git pull origin master
         cd ..
-#        cd script
-#        git checkout master
-#        git pull origin master
-#        cd ..
 
     - name: Install dependencies
       if: matrix.static-link != true

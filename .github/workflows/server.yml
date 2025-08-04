@@ -1,10 +1,9 @@
-name: Automated Test Build (Server Mode)
+name: Build VGPro
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    tags:
+      - 'v*'
 
 jobs:
   build-windows:
@@ -13,25 +12,10 @@ jobs:
       matrix:
         name:
           - windows
-          - windows-x64
-          - windows-ygopro2-ai-server
-#          - windows-2025
         include:
           - name: windows
             os: windows-2022
             vs: vs2022
-          - name: windows-x64
-            os: windows-2022
-            vs: vs2022
-            x64: true
-#          - name: windows-2025
-#            os: windows-2025
-#            vs: vs2025 # to be enabled after the release of Visual Studio 2025
-          - name: windows-ygopro2-ai-server
-            os: windows-2022
-            vs: vs2022
-            x64: true
-            ygopro2: true
 
     runs-on: ${{ matrix.os }}
 
@@ -48,10 +32,6 @@ jobs:
         git checkout master
         git pull origin master
         cd ..
-#        cd script
-#        git checkout master
-#        git pull origin master
-#        cd ..
 
     - name: Download premake
       id: premake
@@ -119,16 +99,14 @@ jobs:
 
     - name: Build solution
       run: |
-        MSBuild.exe build\YGOPro.sln /m /p:Configuration=Release /p:Platform=${{ matrix.x64 && 'x64' || 'Win32' }}
+        MSBuild.exe build\YGOPro.sln /m /p:Configuration=Release
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: YGOPro-Server-${{ matrix.name }}
+        name: YGOPro-Windows
         path: |
-          bin/release/x86/ygopro.exe
-          bin/release/x64/ygopro.exe
-          bin/release/x64/AI.Server.exe
+          bin/release/YGOPro.exe
 
   build-linux:
     strategy:
@@ -137,7 +115,6 @@ jobs:
         name:
           - ubuntu-22
           - ubuntu-24
-          - ubuntu-static-link
           - ubuntu-zip-support
         include:
           - name: ubuntu-22
@@ -260,29 +237,85 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: YGOPro-Server-${{ matrix.name }}
+        name: YGOPro-${{ matrix.name }}
         path: |
           bin/release/ygopro
 
-  publish:
-    needs: [build-windows]
-    if: github.event_name == 'push'
+  create-release:
+    needs: [build-windows, build-linux]
     runs-on: ubuntu-latest
-
     steps:
-    - name: Download build artifacts
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+
+    - name: Download Windows Artifact
       uses: actions/download-artifact@v4
       with:
-        pattern: YGOPro-Server-windows-* # the "windows" (no hyphen) artifact is ignored
-        merge-multiple: true
+        name: YGOPro-Windows
+        path: artifacts/windows
 
-    - name: GitHub Release
-      uses: salix5/action-automatic-releases@node20
+    - name: Download Linux Artifacts
+      uses: actions/download-artifact@v4
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "server-latest"
-        prerelease: true
-        title: "Development Build (Server Mode)"
-        files: |
-          x64/ygopro.exe
-          x64/AI.Server.exe
+        name: YGOPro-ubuntu-22
+        path: artifacts/linux/ubuntu-22
+
+    - name: Download Linux Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: YGOPro-ubuntu-24
+        path: artifacts/linux/ubuntu-24
+
+    - name: Download Linux Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: YGOPro-ubuntu-zip-support
+        path: artifacts/linux/ubuntu-zip-support
+
+    - name: Upload Windows Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/windows/YGOPro.exe
+        asset_name: YGOPro-Windows.exe
+        asset_content_type: application/octet-stream
+
+    - name: Upload Linux Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/linux/ubuntu-22/ygopro
+        asset_name: YGOPro-Linux-ubuntu-22
+        asset_content_type: application/octet-stream
+
+    - name: Upload Linux Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/linux/ubuntu-24/ygopro
+        asset_name: YGOPro-Linux-ubuntu-24
+        asset_content_type: application/octet-stream
+
+    - name: Upload Linux Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: artifacts/linux/ubuntu-zip-support/ygopro
+        asset_name: YGOPro-Linux-ubuntu-zip-support
+        asset_content_type: application/octet-stream

@@ -78,14 +78,6 @@ jobs:
         7z x ${{ steps.sqlite.outputs.filepath }}
         move sqlite-amalgamation-3490100 sqlite3
 
-    - name: Download irrlicht
-      if: matrix.ygopro2 == true
-      run: |
-        git clone https://github.com/mercury233/irrlicht
-        cd irrlicht
-        git checkout 8886cee
-        cd ..
-
     - name: Copy premake files
       run: |
         xcopy /E premake\* .
@@ -123,10 +115,6 @@ jobs:
           - name: ubuntu-24
             os: ubuntu-24.04
             premake-version: 5.0.0-beta6
-          - name: ubuntu-static-link
-            os: ubuntu-22.04
-            premake-version: 5.0.0-beta4
-            static-link: true
           - name: ubuntu-zip-support
             os: ubuntu-22.04
             premake-version: 5.0.0-beta4
@@ -148,12 +136,6 @@ jobs:
         git pull origin master
         cd ..
 
-    - name: Install dependencies
-      if: matrix.static-link != true
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libevent-dev libsqlite3-dev
-
     - name: Download premake
       id: premake
       uses: mercury233/action-cache-download-file@v1.0.0
@@ -166,28 +148,6 @@ jobs:
         tar xf ${{ steps.premake.outputs.filepath }}
         chmod +x ./premake5
 
-    - name: Download libevent
-      if: matrix.static-link == true
-      id: libevent
-      uses: mercury233/action-cache-download-file@v1.0.0
-      with:
-        url: https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
-        filename: libevent.tar.gz
-
-    - name: Extract libevent
-      if: matrix.static-link == true
-      run: |
-        tar xf ${{ steps.libevent.outputs.filepath }}
-        mv libevent-2.1.12-stable event
-
-    - name: Configure libevent
-      if: matrix.static-link == true
-      run: |
-        cd event
-        ./configure --disable-openssl --enable-static=yes --enable-shared=no
-        sed -f make-event-config.sed < config.h > ./include/event2/event-config.h
-        cd ..
-
     - name: Download lua
       id: lua
       uses: mercury233/action-cache-download-file@v1.0.0
@@ -198,19 +158,6 @@ jobs:
       run: |
         tar xf ${{ steps.lua.outputs.filepath }}
         mv lua-5.4.7 lua
-
-    - name: Download sqlite
-      if: matrix.static-link == true
-      id: sqlite
-      uses: mercury233/action-cache-download-file@v1.0.0
-      with:
-        url: https://www.sqlite.org/2025/sqlite-amalgamation-3490100.zip
-
-    - name: Extract sqlite
-      if: matrix.static-link == true
-      run: |
-        7z x ${{ steps.sqlite.outputs.filepath }}
-        mv sqlite-amalgamation-3490100 sqlite3
 
     - name: Download irrlicht
       if: matrix.zip-support == true

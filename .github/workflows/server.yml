@@ -226,6 +226,8 @@ jobs:
   create-release:
     needs: [build-windows, build-linux]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - name: Create Release
       id: create_release
